@@ -24,6 +24,7 @@ export default function DataAnalysisChat() {
   const [input, setInput] = useState("");
   const [chartData, setChartData] = useState<ChartData | null>(null);
   const [waitData, setWaitData] = useState<Boolean>(false);
+  const [threadId, setThreadId] = useState<number | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,7 +35,10 @@ export default function DataAnalysisChat() {
     setInput("");
     setWaitData(true);
     try {
-      const response = await fetch("http://127.0.0.1:8000/agent", {
+      const url = threadId
+        ? `http://127.0.0.1:8000/agent/${threadId}`
+        : "http://127.0.0.1:8000/agent";
+      const response = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: input }),
@@ -55,6 +59,7 @@ export default function DataAnalysisChat() {
       };
       setMessages((prev) => [...prev, newMessage]);
       setChartData(data);
+      if (!threadId) setThreadId(data.id);
     } catch (error) {
       console.error("Error:", error);
       const errorMessage: Message = {
@@ -101,7 +106,6 @@ export default function DataAnalysisChat() {
       </div>
       <div className="w-1/2 border rounded-md p-4">
         {waitData ? <Spinner /> : <ChartDisplay chartData={chartData} />}
-        {/* <Spinner />  */}
       </div>
     </div>
   );
