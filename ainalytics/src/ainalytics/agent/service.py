@@ -1,6 +1,6 @@
 from ainalytics.agent.flow import Flow
-from ainalytics.agent.models import Chart
-from ainalytics.database import PersistedFlowState, engine
+from ainalytics.agent.models import Chart, PersistedFlowState
+from ainalytics.database import engine
 
 from sqlmodel import Session, select
 
