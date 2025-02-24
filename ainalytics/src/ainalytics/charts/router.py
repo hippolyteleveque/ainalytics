@@ -9,7 +9,7 @@ router = APIRouter(prefix="/charts", tags=["charts"])
 @router.get("/", response_model=Charts)
 def charts():
     objs = get_charts()
-    return Charts(charts=[obj.model_dump() for obj in objs])
+    return Charts(charts=objs)
 
 
 @router.post("/")
