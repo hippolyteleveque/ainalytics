@@ -32,3 +32,13 @@ def create_chart(query: str, chart_type: str):
         session.commit()
         session.refresh(obj)
     return obj
+
+
+def chart_delete(id: int):
+    with Session(engine) as session:
+        statement = select(PersistedChart).where(PersistedChart.id == id)
+        obj = session.exec(statement).one_or_none()
+        if obj:
+            session.delete(obj)
+            session.commit()
+    return obj
