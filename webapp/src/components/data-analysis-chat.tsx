@@ -17,14 +17,35 @@ type Message = {
 type ChartData = {
   type: string;
   data: any;
+  query?: string;
+  id?: number;
 };
 
 export default function DataAnalysisChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
-  const [chartData, setChartData] = useState<ChartData | null>(null);
+  const [charts, setCharts] = useState<ChartData[]>([]);
   const [waitData, setWaitData] = useState<Boolean>(false);
   const [threadId, setThreadId] = useState<number | null>(null);
+
+  const numCharts = charts.length;
+  const getChartDimensions = () => {
+    if (numCharts == 1) {
+      return { width: "100%", height: "100%" };
+    } else if (numCharts == 2) {
+      return { width: "100%", height: "50%" };
+    } else {
+      return { width: "33.33%", height: "33.33%" };
+    }
+  };
+  const chartDimensions = getChartDimensions();
+
+  const removeChart = (idx: number) => {
+    setCharts((prev) => {
+      prev.splice(idx, 1);
+      return [...prev];
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,14 +73,14 @@ export default function DataAnalysisChat() {
         throw new Error("Failed to get response from the server");
       }
 
-      const data = await response.json();
+      const data: ChartData = await response.json();
       const newMessage: Message = {
         role: "assistant",
-        content: data.query,
+        content: data.query!,
       };
       setMessages((prev) => [...prev, newMessage]);
-      setChartData(data);
-      if (!threadId) setThreadId(data.id);
+      setCharts((prev) => [...prev.slice(-1), data]);
+      if (!threadId) setThreadId(data.id!);
     } catch (error) {
       console.error("Error:", error);
       const errorMessage: Message = {
@@ -108,11 +129,23 @@ export default function DataAnalysisChat() {
         {waitData ? (
           <Spinner />
         ) : (
-          <ChartDisplay
-            chartData={chartData}
-            pin={true}
-            dimensions={{ width: 100, height: 100 }}
-          />
+          charts.map((chartData, idx) => (
+            <div
+              key={chartData.id}
+              style={{
+                width: chartDimensions.width,
+                height: chartDimensions.height,
+              }}
+              className="p-2 box-border"
+            >
+              <ChartDisplay
+                chartData={chartData}
+                pin={true}
+                dimensions={chartDimensions}
+                onRemoveChart={() => removeChart(idx)}
+              />
+            </div>
+          ))
         )}
       </div>
     </div>
