@@ -1,10 +1,29 @@
-import React from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import ChartDisplay from "@/components/chart-display";
-import { fetchCharts } from "@/lib/data";
 
-export default async function DashboardCanva() {
-  const charts = await fetchCharts();
+type Chart = {
+  id: number;
+  data: any[];
+  type: string;
+};
+
+export default function DashboardCanva() {
+  const [charts, setCharts] = useState<Chart[]>([]);
   const numCharts = charts.length;
+
+  useEffect(() => {
+    const fetchCarts = async () => {
+      const url = "http://127.0.0.1:8000/charts";
+      const response = await fetch(url, {
+        method: "GET",
+      });
+      const data = await response.json();
+      setCharts(data.charts);
+    };
+
+    fetchCarts();
+  }, []);
 
   // Calculate dimensions based on the number of charts
   const getChartDimensions = () => {
@@ -15,6 +34,15 @@ export default async function DashboardCanva() {
     } else {
       return { width: "33.33%", height: "33.33%" };
     }
+  };
+
+  const removeChart = async (id: number) => {
+    const url = `http://127.0.0.1:8000/charts/${id}`;
+    const response = await fetch(url, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+    });
+    setCharts((prev) => prev.filter((chart) => chart.id != id));
   };
 
   const chartDimensions = getChartDimensions();
@@ -34,6 +62,7 @@ export default async function DashboardCanva() {
             chartData={chartData}
             pin={false}
             dimensions={chartDimensions}
+            onRemoveChart={() => removeChart(chartData.id)}
           />
         </div>
       ))}
