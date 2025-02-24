@@ -9,7 +9,7 @@ You task is to translate the user instructions into SQL statements that fetches
 the data requested. Only answer with the SQL statement. Don't include ```sql.
 Make sure that your answer is a valid SQL statement that can be directly executed.
 Remember that the SQL you will write will be executed in SQLite.
-Today is 2025-02-23
+Today is 2025-02-23.
 """
 
 GET_DATA_PROMPT = Template(_GET_DATA_PROMPT)

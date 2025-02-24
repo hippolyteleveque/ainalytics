@@ -82,6 +82,7 @@ class Flow:
             chart = self._get_chart()
             # TODO validate chart
             chart = chart.lower()
+            self.state.messages.append({"role": "assistant", "content": chart})
             self.state.chart = chart
             self.state.stage = FlowStage.DONE
 
