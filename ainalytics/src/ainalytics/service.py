@@ -1,12 +1,10 @@
-from typing import List, Optional
-from datetime import datetime
+from ainalytics.agent.flow import Flow
+from ainalytics.agent.models import Chart
+from ainalytics.database import PersistedFlowState, engine
 
-from sqlmodel import SQLModel, Field, Relationship, create_engine, Session
-from sqlalchemy.sql.expression import text
+from sqlmodel import Session, select
 
-from ainalytics.config import settings
-
-
+DATABASE_DESC = """
 # Customers Table
 class Customers(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -65,20 +63,49 @@ class OrderItems(SQLModel, table=True):
     order: Orders = Relationship(back_populates="order_items")
     product: Products = Relationship(back_populates="order_items")
 
+"""
 
-engine = create_engine(settings.DATABASE_URL)
+charts = [
+    Chart(
+        name="pie",
+        description="Used to show proportions or percentages of a whole, where each slice represents a category's contribution.",
+    ),
+    Chart(
+        name="line",
+        description="Ideal for displaying trends over time, showing continuous data points connected by lines.",
+    ),
+    Chart(
+        name="bar",
+        description="Effective for comparing quantities across different categories, using horizontal or vertical bars.",
+    ),
+]
 
 
-def exec_sql(statement: str):
+def run_new_agent(message: str):
+    flow = Flow(database_desc=DATABASE_DESC, chart_desc=charts)
+    state = flow.run(message)
+
     with Session(engine) as session:
-        result = session.exec(text(statement))
-        return result
+        obj = PersistedFlowState.from_flow_state(state)
+        session.add(obj)
+        session.commit()
+        session.refresh(obj)
+
+    data = [{"name": pt[0], "value": pt[1]} for pt in state.data]
+    return state, data, obj.id
 
 
-# Create all tables
-def create_db_and_tables(engine):
-    SQLModel.metadata.create_all(engine)
+def run_agent(message: str, state_id: int):
+    with Session(engine) as session:
+        statement = select(PersistedFlowState).where(PersistedFlowState.id == state_id)
+        obj = session.exec(statement).first()
+        state = obj.to_flow_state()
+    flow = Flow(database_desc=DATABASE_DESC, chart_desc=charts, state=state)
+    state = flow.run(message)
+    obj.update(state)
+    with Session(engine) as session:
+        session.add(obj)
+        session.commit()
 
-
-if __name__ == "__main__":
-    create_db_and_tables(engine)
+    data = [{"name": pt[0], "value": pt[1]} for pt in state.data]
+    return state, data

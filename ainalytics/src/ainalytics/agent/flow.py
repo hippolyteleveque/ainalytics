@@ -1,29 +1,16 @@
-from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
-from pydantic import BaseModel
 from openai import OpenAI
 
 from ainalytics.config import settings
-from ainalytics.agent.prompts import GET_DATA_PROMPT, GET_DISPLAY_PROMPT, GET_DISPLAY_USR_PROMPT
+from ainalytics.agent.prompts import (
+    GET_DATA_PROMPT,
+    GET_DISPLAY_PROMPT,
+    GET_DISPLAY_USR_PROMPT,
+)
 from ainalytics.agent.helpers import extract_raw_code
-from ainalytics.agent.database import exec_sql
-from ainalytics.agent.models import Chart
-
-
-class FlowStage(Enum):
-    GET_DATA = "get"
-    TRANSFORM_DATA = "transform"
-    DISPLAY_DATA = "display"
-    DONE = "done"
-
-
-class FlowState(BaseModel):
-    stage: FlowStage = FlowStage.GET_DATA
-    messages: list[dict] = []
-    data: Optional[Any] = None
-    query: Optional[str] = None
-    chart: Optional[str] = None
+from ainalytics.external.database import exec_sql
+from ainalytics.agent.models import Chart, FlowState, FlowStage
 
 
 class Flow:
@@ -41,6 +28,8 @@ class Flow:
             self.state = FlowState()
         else:
             self.state = state
+            # TODO for now we always consider that we reset it
+            self.state.stage = FlowStage.GET_DATA
 
     def _get_prompt(self) -> str:
         if self.state.stage == FlowStage.GET_DATA:
@@ -92,6 +81,7 @@ class Flow:
         elif self.state.stage == FlowStage.DISPLAY_DATA:
             chart = self._get_chart()
             # TODO validate chart
+            chart = chart.lower()
             self.state.chart = chart
             self.state.stage = FlowStage.DONE
 

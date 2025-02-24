@@ -5,7 +5,7 @@ import random
 
 
 # Import your models and engine
-from ainalytics.database import (
+from ainalytics.external.database import (
     Customers,
     Products,
     Categories,
