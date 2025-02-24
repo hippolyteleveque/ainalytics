@@ -68,7 +68,7 @@ export default function DataAnalysisChat() {
   };
 
   return (
-    <div className="flex h-[600px]">
+    <div className="flex w-full h-[800px]">
       <div className="w-1/2 flex flex-col mr-4">
         <ScrollArea className="flex-grow border rounded-md p-4 mb-4">
           {messages.map((message, index) => (

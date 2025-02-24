@@ -40,11 +40,11 @@ export default function ChartDisplay({ chartData }: ChartDisplayProps) {
   const { type, data } = chartData;
 
   const colors = [
-    "#2563eb", // blue-600
-    "#16a34a", // green-600
-    "#ea580c", // orange-600
-    "#9333ea", // purple-600
-    "#e11d48", // rose-600
+    "hsl(var(--chart-1))",
+    "hsl(var(--chart-2))",
+    "hsl(var(--chart-3))",
+    "hsl(var(--chart-4))",
+    "hsl(var(--chart-5))",
   ];
   const usedData = data.map((entry: any, index: number) => ({
     ...entry,
