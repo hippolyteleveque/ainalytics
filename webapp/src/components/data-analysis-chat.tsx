@@ -73,7 +73,7 @@ export default function DataAnalysisChat() {
   };
 
   return (
-    <div className="flex w-full h-[800px]">
+    <div className="flex w-full h-[700px]">
       <div className="w-1/2 flex flex-col mr-4">
         <ScrollArea className="flex-grow border rounded-md p-4 mb-4">
           {messages.map((message, index) => (
@@ -105,7 +105,15 @@ export default function DataAnalysisChat() {
         </form>
       </div>
       <div className="w-1/2 border rounded-md p-4">
-        {waitData ? <Spinner /> : <ChartDisplay chartData={chartData} />}
+        {waitData ? (
+          <Spinner />
+        ) : (
+          <ChartDisplay
+            chartData={chartData}
+            pin={true}
+            dimensions={{ width: 100, height: 100 }}
+          />
+        )}
       </div>
     </div>
   );
