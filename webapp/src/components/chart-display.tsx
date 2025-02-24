@@ -56,6 +56,8 @@ export default function ChartDisplay({
     }
   };
 
+
+
   if (!chartData) {
     return (
       <div className="h-full flex items-center justify-center text-gray-500">
