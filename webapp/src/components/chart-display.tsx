@@ -18,7 +18,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { Button } from "@/components/ui/button";
-import { PinIcon, CheckIcon } from "lucide-react";
+import { PinIcon, CheckIcon, XIcon } from "lucide-react";
 import { useState } from "react";
 
 type ChartData = {
@@ -32,14 +32,17 @@ type ChartDisplayProps = {
   chartData: ChartData | null;
   pin: boolean;
   dimensions: { width: string; height: string };
+  onRemoveChart?: () => void;
 };
 
 export default function ChartDisplay({
   chartData,
   pin,
   dimensions,
+  onRemoveChart,
 }: ChartDisplayProps) {
   const [pinned, setPinned] = useState(false);
+
   const handlePinChart = async () => {
     setPinned(true);
     const url = "http://127.0.0.1:8000/charts";
@@ -135,20 +138,22 @@ export default function ChartDisplay({
         return <div>Unsupported chart type</div>;
     }
   };
-
   const renderPin = () => (
-    <Button
-      className="absolute top-2 right-2 p-2"
-      variant="outline"
-      size="sm"
-      onClick={handlePinChart}
-    >
+    <Button variant="outline" size="sm" onClick={handlePinChart}>
       {pinned ? (
         <CheckIcon className="h-4 w-4 text-green-500" />
       ) : (
         <PinIcon className="h-4 w-4" />
       )}
     </Button>
+  );
+  const renderActions = () => (
+    <div className="absolute top-2 right-2 p-2">
+      {pin && renderPin()}
+      <Button variant="outline" size="sm" onClick={onRemoveChart}>
+        <XIcon className="h-4 w-4 text-red-500" />
+      </Button>
+    </div>
   );
 
   const config: Record<string, { label: string; color: string }> = {};
@@ -165,7 +170,7 @@ export default function ChartDisplay({
         {renderChart()}
       </ChartContainer>
 
-      {pin && renderPin()}
+      {renderActions()}
     </div>
   );
 }
