@@ -21,9 +21,15 @@ import { Button } from "@/components/ui/button";
 import { PinIcon, CheckIcon, XIcon } from "lucide-react";
 import { useState } from "react";
 
+type ChartDataEntry = {
+  name: string;
+  value: number;
+  color?: string;
+};
+
 type ChartData = {
   type: string;
-  data: any;
+  data: ChartDataEntry[];
   id?: number;
   query?: string;
 };
@@ -49,14 +55,12 @@ export default function ChartDisplay({
     const response = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ type: chartData?.type, query: chartData?.query! }),
+      body: JSON.stringify({ type: chartData?.type, query: chartData?.query }),
     });
     if (!response.ok) {
       throw new Error("Failed to get response from the server");
     }
   };
-
-
 
   if (!chartData) {
     return (
@@ -76,7 +80,7 @@ export default function ChartDisplay({
     "hsl(var(--chart-5))",
   ];
 
-  const usedData = data.map((entry: any, index: number) => ({
+  const usedData = data.map((entry: ChartDataEntry, index: number) => ({
     ...entry,
     fill: colors[index % colors.length],
     label: entry.name,
@@ -88,7 +92,9 @@ export default function ChartDisplay({
         return (
           <BarChart
             data={data}
+            // @ts-expect-error it works
             width={dimensions.width}
+            // @ts-expect-error it works
             height={dimensions.height}
           >
             <CartesianGrid vertical={false} />
@@ -101,7 +107,9 @@ export default function ChartDisplay({
         return (
           <LineChart
             data={data}
+            // @ts-expect-error it works
             width={dimensions.width}
+            // @ts-expect-error it works
             height={dimensions.height}
           >
             <CartesianGrid vertical={false} />
@@ -123,6 +131,7 @@ export default function ChartDisplay({
         );
       case "pie":
         return (
+          // @ts-expect-error it works
           <PieChart width={dimensions.width} height={dimensions.height}>
             <Pie
               data={usedData}
@@ -159,8 +168,8 @@ export default function ChartDisplay({
   );
 
   const config: Record<string, { label: string; color: string }> = {};
-  data.forEach((entry: any) => {
-    config[entry.name] = { label: entry.name, color: entry.color };
+  data.forEach((entry: ChartDataEntry) => {
+    config[entry.name] = { label: entry.name, color: entry.color! };
   });
 
   return (

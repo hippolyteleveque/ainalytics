@@ -14,18 +14,28 @@ type Message = {
   content: string;
 };
 
+type ChartDataEntry = {
+  name: string;
+  value: number;
+  color?: string;
+};
+
 type ChartData = {
   type: string;
-  data: any;
+  data: ChartDataEntry[];
   query?: string;
   id?: number;
 };
 
-export default function DataAnalysisChat() {
+type DataAnalysisChatProps = {
+  session: { accessToken: string }; // Define the expected structure of session
+};
+
+export default function DataAnalysisChat({ session }: DataAnalysisChatProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [charts, setCharts] = useState<ChartData[]>([]);
-  const [waitData, setWaitData] = useState<Boolean>(false);
+  const [waitData, setWaitData] = useState<boolean>(false);
   const [threadId, setThreadId] = useState<number | null>(null);
 
   const numCharts = charts.length;
@@ -39,7 +49,7 @@ export default function DataAnalysisChat() {
     }
   };
   const chartDimensions = getChartDimensions();
-
+  const token = session.accessToken;
   const removeChart = (idx: number) => {
     setCharts((prev) => {
       prev.splice(idx, 1);
@@ -61,7 +71,10 @@ export default function DataAnalysisChat() {
         : "http://127.0.0.1:8000/agent";
       const response = await fetch(url, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ message: input }),
       });
       // const response = await fetch("/api/analyze", {
