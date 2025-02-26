@@ -1,5 +1,7 @@
 from ainalytics.agent.models import *  # noqa: F403
 from ainalytics.charts.models import *  # noqa: F403
+from ainalytics.auth.models import *  # noqa: F403
+
 
 from .database import metadata, engine
 

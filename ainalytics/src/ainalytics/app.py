@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from ainalytics.agent.router import router as agent_router
 from ainalytics.charts.router import router as charts_router
+from ainalytics.auth.router import users_router, auth_router
 
 app = FastAPI()
 
@@ -24,3 +25,5 @@ configure_cors()
 
 app.include_router(agent_router)
 app.include_router(charts_router)
+app.include_router(users_router)
+app.include_router(auth_router)
