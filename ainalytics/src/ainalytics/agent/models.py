@@ -35,6 +35,7 @@ class PersistedFlowState(AppTable, table=True):
     stage: str
     query: Optional[str]
     chart: Optional[str]
+    user_id: int = Field(foreign_key="users.id")
 
     messages: List["PersistedMessage"] = Relationship(back_populates="flowstate")
 
@@ -63,13 +64,14 @@ class PersistedFlowState(AppTable, table=True):
         ]
 
     @classmethod
-    def from_flow_state(cls, state: FlowState) -> "PersistedFlowState":
+    def from_flow_state(cls, state: FlowState, user_id: int) -> "PersistedFlowState":
         dump = state.model_dump()
         _ = dump.pop("data")
         messages = dump.pop("messages")
         stage = dump.pop("stage").value
         obj = cls(
             **dump,
+            user_id=user_id,
             stage=stage,
             messages=[
                 PersistedMessage(role=message["role"], content=message["content"])
