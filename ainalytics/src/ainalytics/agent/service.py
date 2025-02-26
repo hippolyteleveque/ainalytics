@@ -81,12 +81,12 @@ charts = [
 ]
 
 
-def run_new_agent(message: str):
+def run_new_agent(message: str, user_id: int):
     flow = Flow(database_desc=DATABASE_DESC, chart_desc=charts)
     state = flow.run(message)
 
     with Session(engine) as session:
-        obj = PersistedFlowState.from_flow_state(state)
+        obj = PersistedFlowState.from_flow_state(state, user_id)
         session.add(obj)
         session.commit()
         session.refresh(obj)
