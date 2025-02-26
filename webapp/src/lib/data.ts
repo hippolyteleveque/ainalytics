@@ -1,6 +1,11 @@
+type ChartData = {
+  name: string;
+  value: number;
+  color?: string;
+};
 type Chart = {
   id: number;
-  data: any[];
+  data: ChartData[];
   type: string;
 };
 

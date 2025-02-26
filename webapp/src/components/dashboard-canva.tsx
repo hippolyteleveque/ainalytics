@@ -2,9 +2,15 @@
 import React, { useEffect, useState } from "react";
 import ChartDisplay from "@/components/chart-display";
 
+type ChartDataEntry = {
+  name: string;
+  value: number;
+  color?: string;
+};
+
 type Chart = {
   id: number;
-  data: any[];
+  data: ChartDataEntry[];
   type: string;
 };
 
@@ -38,7 +44,8 @@ export default function DashboardCanva() {
 
   const removeChart = async (id: number) => {
     const url = `http://127.0.0.1:8000/charts/${id}`;
-    const response = await fetch(url, {
+    // TODO handle error
+    await fetch(url, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
     });
