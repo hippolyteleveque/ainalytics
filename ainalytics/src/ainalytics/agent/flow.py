@@ -10,7 +10,7 @@ from ainalytics.agent.prompts import (
 )
 from ainalytics.agent.helpers import extract_raw_code
 from ainalytics.external.database import exec_sql
-from ainalytics.agent.models import Chart, FlowState, FlowStage
+from ainalytics.agent.models import Chart, FlowState, FlowStage, SqlResponse
 
 
 class Flow:
@@ -39,15 +39,16 @@ class Flow:
 
     def _get_sql_query(
         self,
-    ) -> str:  # we could have a special type that validate query there
+    ) -> SqlResponse:  # we could have a special type that validate query there
         system = self._get_prompt()
-        response = self.client.chat.completions.create(
+        response = self.client.beta.chat.completions.parse(
             model=settings.MODEL_ID,
             messages=[{"role": "system", "content": system}] + self.state.messages,
             temperature=0,
+            response_format=SqlResponse,
         )
-        res = response.choices[0].message.content
-        res = extract_raw_code(res)
+        res = response.choices[0].message.parsed
+        res.sql_statement = extract_raw_code(res.sql_statement)
         return res
 
     def _exec_sql(self, statement: str) -> list[Any]:
@@ -73,16 +74,17 @@ class Flow:
     def step(self):
         if self.state.stage == FlowStage.GET_DATA:
             query = self._get_sql_query()
-            self.state.query = query
-            self.state.messages.append({"role": "assistant", "content": query})
-            rows = self._exec_sql(query)
+            self.state.query = query.sql_statement
+            self.state.messages.append(
+                {"role": "assistant", "content": query.explanation}
+            )
+            rows = self._exec_sql(query.sql_statement)
             self.state.data = rows
             self.state.stage = FlowStage.DISPLAY_DATA
         elif self.state.stage == FlowStage.DISPLAY_DATA:
             chart = self._get_chart()
             # TODO validate chart
             chart = chart.lower()
-            self.state.messages.append({"role": "assistant", "content": chart})
             self.state.chart = chart
             self.state.stage = FlowStage.DONE
 

@@ -10,6 +10,7 @@ class Message(BaseModel):
 class ChartDisplay(BaseModel):
     query: str
     type: str
+    message: str
     data: list[Any]
 
 

@@ -1,15 +1,28 @@
 from jinja2 import Template
 
+# _GET_DATA_PROMPT = """
+# You are a world class expert for querying data from databases.
+# You are given the following database:
+# {{ database }}
+
+# You task is to translate the user instructions into SQL statements that fetches
+# the data requested. Only answer with the SQL statement. Don't include ```sql.
+# Make sure that your answer is a valid SQL statement that can be directly executed.
+# Remember that the SQL you will write will be executed in SQLite.
+# Today is 2025-02-23.
+# """
+
 _GET_DATA_PROMPT = """
 You are a world class expert for querying data from databases.
 You are given the following database:
 {{ database }}
 
-You task is to translate the user instructions into SQL statements that fetches
-the data requested. Only answer with the SQL statement. Don't include ```sql.
-Make sure that your answer is a valid SQL statement that can be directly executed.
-Remember that the SQL you will write will be executed in SQLite.
-Today is 2025-02-23.
+You task is to translate the user instructions into an SQL statements that fetches the requested data and
+explain in non technical terms what the request does in a friendly manner.
+You need to provide first the explanation and then the sql statement. The sql
+will be executed in sqlite.
+
+Fo your information, today in 2025-02-23.
 """
 
 GET_DATA_PROMPT = Template(_GET_DATA_PROMPT)
