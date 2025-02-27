@@ -54,6 +54,7 @@ class Orders(SQLModel, table=True):
 
 # OrderItems Table
 class OrderItems(SQLModel, table=True):
+    __tablename__ = "orderitems"
     id: Optional[int] = Field(default=None, primary_key=True)
     order_id: int = Field(foreign_key="orders.id")
     product_id: int = Field(foreign_key="products.id")

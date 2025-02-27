@@ -12,7 +12,10 @@ router = APIRouter(prefix="/agent", tags=["agent"])
 @router.post("/new", response_model=ChartDisplayId)
 def agent_new(request: Message, current_user: CurrentUser):
     state, data, obj_id = run_new_agent(request.message, user_id=current_user.id)
-    return ChartDisplayId(type=state.chart, data=data, query=state.query, id=obj_id)
+    message = state.messages[-1]["content"]
+    return ChartDisplayId(
+        type=state.chart, data=data, query=state.query, id=obj_id, message=message
+    )
 
 
 @router.post("/{id}", response_model=ChartDisplay)
@@ -21,4 +24,5 @@ def agent(request: Message, id: int):
         request.message,
         id,
     )
-    return ChartDisplay(type=state.chart, data=data, query=state.query)
+    message = state.messages[-1]
+    return ChartDisplay(type=state.chart, data=data, query=state.query, message=message)

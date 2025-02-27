@@ -2,10 +2,22 @@ from enum import Enum
 from typing import Optional, Any, List
 
 from pydantic import BaseModel
+from pydantic import Field as PyField
 from sqlmodel import Field, Relationship
 
 from ainalytics.database import AppTable
 from ainalytics.external.database import exec_sql
+
+
+class SqlResponse(BaseModel):
+    """The sql reponse and query explanations"""
+
+    explanation: str = PyField(
+        description="The explanation of the query in simple, non technical terms"
+    )
+    sql_statement: str = PyField(
+        description="The SQL statement that will be directly executed in SQLITE, only include the raw statement."
+    )
 
 
 class Chart(BaseModel):
