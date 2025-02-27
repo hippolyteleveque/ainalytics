@@ -72,10 +72,10 @@ export default function DataAnalysisChat() {
         throw new Error("Failed to get response from the server");
       }
 
-      const data: ChartData = await response.json();
+      const data = await response.json();
       const newMessage: Message = {
         role: "assistant",
-        content: data.query!,
+        content: data.message,
       };
       setMessages((prev) => [...prev, newMessage]);
       setCharts((prev) => [...prev.slice(-1), data]);
