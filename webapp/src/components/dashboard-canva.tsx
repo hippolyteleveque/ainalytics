@@ -3,20 +3,8 @@ import React, { useEffect, useState } from "react";
 import ChartDisplay from "@/components/chart-display";
 import { useSession } from "next-auth/react";
 
-type ChartDataEntry = {
-  name: string;
-  value: number;
-  color?: string;
-};
-
-type Chart = {
-  id: number;
-  data: ChartDataEntry[];
-  type: string;
-};
-
 export default function DashboardCanva() {
-  const [charts, setCharts] = useState<Chart[]>([]);
+  const [charts, setCharts] = useState<ChartData[]>([]);
   const session = useSession();
   const numCharts = charts.length;
   // @ts-expect-error Next Auth is pussy library
@@ -80,7 +68,7 @@ export default function DashboardCanva() {
             chartData={chartData}
             pin={false}
             dimensions={chartDimensions}
-            onRemoveChart={() => removeChart(chartData.id)}
+            onRemoveChart={() => removeChart(chartData.id!)}
           />
         </div>
       ))}

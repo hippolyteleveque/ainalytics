@@ -15,19 +15,6 @@ type Message = {
   content: string;
 };
 
-type ChartDataEntry = {
-  name: string;
-  value: number;
-  color?: string;
-};
-
-type ChartData = {
-  type: string;
-  data: ChartDataEntry[];
-  query?: string;
-  id?: number;
-};
-
 export default function DataAnalysisChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");

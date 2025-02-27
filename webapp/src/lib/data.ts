@@ -1,17 +1,6 @@
-type ChartData = {
-  name: string;
-  value: number;
-  color?: string;
-};
-type Chart = {
-  id: number;
-  data: ChartData[];
-  type: string;
-};
-
 const API_URL = process.env.API_URL;
 
-export async function fetchCharts(): Promise<Chart[]> {
+export async function fetchCharts(): Promise<ChartData[]> {
   const url = `${API_URL}/charts`;
   const response = await fetch(url, {
     method: "GET",

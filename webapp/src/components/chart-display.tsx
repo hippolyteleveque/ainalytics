@@ -22,18 +22,7 @@ import { PinIcon, CheckIcon, XIcon } from "lucide-react";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 
-type ChartDataEntry = {
-  name: string;
-  value: number;
-  color?: string;
-};
 
-type ChartData = {
-  type: string;
-  data: ChartDataEntry[];
-  id?: number;
-  query?: string;
-};
 
 type ChartDisplayProps = {
   chartData: ChartData | null;
