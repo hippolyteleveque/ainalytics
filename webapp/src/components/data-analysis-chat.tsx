@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useSession } from "next-auth/react";
 import ChartDisplay from "@/components/chart-display";
 import Spinner from "./spinner";
 
@@ -27,16 +28,13 @@ type ChartData = {
   id?: number;
 };
 
-type DataAnalysisChatProps = {
-  session: { accessToken: string }; // Define the expected structure of session
-};
-
-export default function DataAnalysisChat({ session }: DataAnalysisChatProps) {
+export default function DataAnalysisChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [charts, setCharts] = useState<ChartData[]>([]);
   const [waitData, setWaitData] = useState<boolean>(false);
   const [threadId, setThreadId] = useState<number | null>(null);
+  const session = useSession();
 
   const numCharts = charts.length;
   const getChartDimensions = () => {
@@ -49,7 +47,8 @@ export default function DataAnalysisChat({ session }: DataAnalysisChatProps) {
     }
   };
   const chartDimensions = getChartDimensions();
-  const token = session.accessToken;
+  // @ts-expect-error Next Auth is pussy library
+  const token = session.data.accessToken;
   const removeChart = (idx: number) => {
     setCharts((prev) => {
       prev.splice(idx, 1);

@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import ChartDisplay from "@/components/chart-display";
+import { useSession } from "next-auth/react";
 
 type ChartDataEntry = {
   name: string;
@@ -16,19 +17,26 @@ type Chart = {
 
 export default function DashboardCanva() {
   const [charts, setCharts] = useState<Chart[]>([]);
+  const session = useSession();
   const numCharts = charts.length;
+  // @ts-expect-error Next Auth is pussy library
+  const token = session.data.accessToken;
 
   useEffect(() => {
-    const fetchCarts = async () => {
+    const fetchCharts = async () => {
       const url = "http://127.0.0.1:8000/charts";
       const response = await fetch(url, {
         method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
       });
       const data = await response.json();
       setCharts(data.charts);
     };
 
-    fetchCarts();
+    fetchCharts();
   }, []);
 
   // Calculate dimensions based on the number of charts
@@ -47,7 +55,10 @@ export default function DashboardCanva() {
     // TODO handle error
     await fetch(url, {
       method: "DELETE",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
     });
     setCharts((prev) => prev.filter((chart) => chart.id != id));
   };

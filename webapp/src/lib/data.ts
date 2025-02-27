@@ -9,11 +9,26 @@ type Chart = {
   type: string;
 };
 
+const API_URL = process.env.API_URL;
+
 export async function fetchCharts(): Promise<Chart[]> {
-  const url = "http://127.0.0.1:8000/charts";
+  const url = `${API_URL}/charts`;
   const response = await fetch(url, {
     method: "GET",
   });
   const data = await response.json();
   return data.charts;
 }
+
+// export async function postChart(token: string) {
+//   const url = `${API_URL}/charts`;
+//   const response = await fetch(url, {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json",
+//       Authorization: `Bearer ${token}`,
+//     },
+//   });
+//   const data = await response.json();
+//   return data.charts;
+// }
