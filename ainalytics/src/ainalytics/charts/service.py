@@ -12,9 +12,9 @@ def _get_format_data(query: str) -> dict:
     return data
 
 
-def get_charts():
+def get_charts(user_id: int) -> list[dict]:
     with Session(engine) as session:
-        statement = select(PersistedChart)
+        statement = select(PersistedChart).where(PersistedChart.user_id == user_id)
         objs = session.exec(statement).all()
     # TODO correct this, awful
     res = [
@@ -25,8 +25,8 @@ def get_charts():
     return res
 
 
-def create_chart(query: str, chart_type: str):
-    obj = PersistedChart(type=chart_type, query=query)
+def create_chart(query: str, chart_type: str, user_id: int) -> PersistedChart:
+    obj = PersistedChart(type=chart_type, query=query, user_id=user_id)
     with Session(engine) as session:
         session.add(obj)
         session.commit()
@@ -37,6 +37,20 @@ def create_chart(query: str, chart_type: str):
 def chart_delete(id: int):
     with Session(engine) as session:
         statement = select(PersistedChart).where(PersistedChart.id == id)
+        obj = session.exec(statement).one_or_none()
+        if obj:
+            session.delete(obj)
+            session.commit()
+    return obj
+
+
+def delete_chart_user(id: int, user_id: int):
+    with Session(engine) as session:
+        statement = (
+            select(PersistedChart)
+            .where(PersistedChart.id == id)
+            .where(PersistedChart.user_id == user_id)
+        )
         obj = session.exec(statement).one_or_none()
         if obj:
             session.delete(obj)
