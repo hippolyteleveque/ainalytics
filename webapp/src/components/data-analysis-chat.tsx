@@ -13,6 +13,7 @@ import Spinner from "./spinner";
 type Message = {
   role: "user" | "assistant";
   content: string;
+  query?: string;
 };
 
 export default function DataAnalysisChat() {
@@ -21,9 +22,18 @@ export default function DataAnalysisChat() {
   const [charts, setCharts] = useState<ChartData[]>([]);
   const [waitData, setWaitData] = useState<boolean>(false);
   const [threadId, setThreadId] = useState<number | null>(null);
+  const [expandedMessages, setExpandedMessages] = useState<number[]>([]);
+
   const session = useSession();
 
   const numCharts = charts.length;
+
+  const toggleExpand = (index: number) => {
+    setExpandedMessages((prev) =>
+      prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
+    );
+  };
+
   const getChartDimensions = () => {
     if (numCharts == 1) {
       return { width: "100%", height: "100%" };
@@ -76,6 +86,7 @@ export default function DataAnalysisChat() {
       const newMessage: Message = {
         role: "assistant",
         content: data.message,
+        query: data.query,
       };
       setMessages((prev) => [...prev, newMessage]);
       setCharts((prev) => [...prev.slice(-1), data]);
@@ -97,19 +108,27 @@ export default function DataAnalysisChat() {
       <div className="w-1/2 flex flex-col mr-4">
         <ScrollArea className="flex-grow border rounded-md p-4 mb-4">
           {messages.map((message, index) => (
-            <div
-              key={index}
-              className="mb-2"
-              style={{
-                color: `hsl(${
-                  message.role === "user" ? "var(--chart-2)" : "var(--chart-3)"
-                })`,
-              }}
-            >
+            <div key={index} className="mb-2">
               <strong>
                 {message.role === "user" ? "You: " : "Assistant: "}
               </strong>
               {message.content}
+              {message.role === "assistant" && message.query && (
+                <div>
+                  <Button
+                    onClick={() => toggleExpand(index)}
+                    className="mt-2"
+                    variant="outline"
+                  >
+                    {expandedMessages.includes(index) ? "Hide SQL" : "Show SQL"}
+                  </Button>
+                  {expandedMessages.includes(index) && (
+                    <pre className="mt-2 p-2 bg-gray-100 rounded-md">
+                      <code>{message.query}</code>
+                    </pre>
+                  )}
+                </div>
+              )}
             </div>
           ))}
         </ScrollArea>
